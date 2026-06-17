@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GUX Cart - Ride Completed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#68000a",
+                    "on-primary-fixed-variant": "#005236",
+                    "surface-variant": "#2d3449",
+                    "outline-variant": "#3c4a42",
+                    "secondary-fixed": "#ffddb8",
+                    "secondary": "#ffb95f",
+                    "inverse-on-surface": "#283044",
+                    "on-error": "#690005",
+                    "primary": "#4edea3",
+                    "background": "#0b1326",
+                    "on-tertiary-container": "#79000e",
+                    "on-tertiary-fixed-variant": "#930013",
+                    "surface-container-high": "#222a3d",
+                    "surface-container-highest": "#2d3449",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ffb95f",
+                    "on-surface": "#dae2fd",
+                    "surface-bright": "#31394d",
+                    "on-primary-container": "#00422b",
+                    "tertiary-container": "#ff7a73",
+                    "surface-tint": "#4edea3",
+                    "on-secondary": "#472a00",
+                    "on-secondary-fixed": "#2a1700",
+                    "on-primary-fixed": "#002113",
+                    "surface-container-low": "#131b2e",
+                    "error": "#ffb4ab",
+                    "primary-fixed-dim": "#4edea3",
+                    "on-tertiary-fixed": "#410004",
+                    "secondary-container": "#ee9800",
+                    "tertiary-fixed": "#ffdad7",
+                    "inverse-primary": "#006c49",
+                    "surface-container-lowest": "#060e20",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "on-surface-variant": "#bbcabf",
+                    "tertiary": "#ffb3ad",
+                    "outline": "#86948a",
+                    "inverse-surface": "#dae2fd",
+                    "surface-dim": "#0b1326",
+                    "primary-container": "#10b981",
+                    "surface": "#0b1326",
+                    "primary-fixed": "#6ffbbe",
+                    "surface-container": "#171f33",
+                    "on-secondary-fixed-variant": "#653e00",
+                    "on-primary": "#003824",
+                    "error-container": "#93000a",
+                    "on-secondary-container": "#5b3800",
+                    "on-background": "#dae2fd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap": "12px",
+                    "container-padding": "20px",
+                    "section-margin": "24px",
+                    "touch-target": "48px",
+                    "bottom-sheet-peak": "280px"
+            },
+            "fontFamily": {
+                    "title-md": ["Outfit"],
+                    "body-md": ["Outfit"],
+                    "body-lg": ["Outfit"],
+                    "headline-lg": ["Outfit"],
+                    "headline-lg-mobile": ["Outfit"],
+                    "label-sm": ["Outfit"],
+                    "headline-xl": ["Outfit"],
+                    "label-md": ["Outfit"]
+            },
+            "fontSize": {
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "26px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .star-rating .star {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .star-rating .star.active {
+            font-variation-settings: 'FILL' 1;
+            color: #FFB95F;
+            filter: drop-shadow(0 0 8px rgba(255, 185, 95, 0.4));
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center justify-center p-container-padding overflow-x-hidden">
+<!-- Top AppBar (JSON Component Implementation) -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-md bg-background/70 shadow-sm flex justify-between items-center px-container-padding py-4 w-full">
+<div class="text-title-md font-title-md font-black text-primary">GUX Cart</div>
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A close-up professional profile portrait of a smiling university student with soft cinematic lighting. The image should be warm and inviting, capturing the modern campus life vibe with a shallow depth of field background that hints at high-tech university architecture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZFIa0cW1mwt1qRThA89di_T35dujnWeskh5ay6GsUIuFiOnROw5LrJDV8y1HmuSJJG8Dq943oQVNP0rzHzdqPbBeyzXTYAq0cSV1D_Nq_RBJ7Q2_rbPA104mfOGxGZ2jhHLtjxVIQWJfObhciaGdBHFY4FNfTPxi15J_uBjMUUrX2u9ED2IBimQMKJAGI3NupmTG_o7va0FS9qfc_8fTV99zPq_YHPq86RKsuwimIsztueNQpaR_ns9XF0h0GRJChHpHhby0TuVk"/>
+</div>
+</div>
+</header>
+<!-- Background Atmospheric Effect -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-40">
+<div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[100px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[80px]"></div>
+</div>
+<!-- Main Feedback Canvas -->
+<main class="w-full max-w-md pt-20 pb-32">
+<div class="glass-panel rounded-[24px] p-8 shadow-[0px_10px_30px_rgba(0,0,0,0.2)] animate-in fade-in slide-in-from-bottom-8 duration-700">
+<!-- Ride Completion Summary -->
+<div class="flex flex-col items-center text-center mb-8">
+<div class="w-24 h-24 mb-6 rounded-2xl bg-primary/10 p-4 flex items-center justify-center overflow-hidden">
+<img alt="GUX Cart Logo" class="w-full h-full object-contain" src="data:image/png;base64,STRIPPED"/>
+</div>
+<h1 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface mb-2">Ride Completed!</h1>
+<p class="text-body-md font-body-md text-on-surface-variant">How was your trip from the Student Union to Engineering Hall?</p>
+</div>
+<!-- Interactive Rating -->
+<div class="flex flex-col items-center gap-4 mb-10">
+<div class="star-rating flex items-center gap-2" id="starContainer">
+<span class="material-symbols-outlined star text-4xl" data-index="1">star</span>
+<span class="material-symbols-outlined star text-4xl" data-index="2">star</span>
+<span class="material-symbols-outlined star text-4xl" data-index="3">star</span>
+<span class="material-symbols-outlined star text-4xl" data-index="4">star</span>
+<span class="material-symbols-outlined star text-4xl" data-index="5">star</span>
+</div>
+<p class="text-label-md font-label-md text-secondary uppercase tracking-widest h-5" id="ratingLabel"></p>
+</div>
+<!-- Feedback Field -->
+<div class="space-y-4 mb-8">
+<label class="text-label-md font-label-md text-on-surface-variant px-1" for="feedback">Share more details (Optional)</label>
+<textarea class="w-full bg-surface-container-low border-transparent focus:border-primary-container focus:ring-0 rounded-xl text-on-surface placeholder:text-outline-variant p-4 transition-all duration-300 resize-none text-body-md font-body-md" id="feedback" placeholder="Tell us more about your experience..." rows="4"></textarea>
+</div>
+<!-- Submit Action -->
+<button class="w-full h-touch-target bg-primary-container text-on-primary-container font-title-md text-title-md rounded-xl shadow-[0_4px_12px_rgba(16,185,129,0.3)] hover:brightness-110 active:scale-95 transition-all duration-200" id="submitBtn">
+                Submit Feedback
+            </button>
+</div>
+<!-- Receipt Glimpse (Contextual Detail) -->
+<div class="mt-6 flex flex-col gap-stack-gap px-4">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="text-label-md font-label-md">Duration: 8 min</span>
+<span class="text-label-md font-label-md">Distance: 1.2 miles</span>
+</div>
+<div class="h-[1px] bg-outline-variant/30"></div>
+<div class="flex justify-between items-center text-primary font-bold">
+<span class="text-label-md font-label-md">Total Points Earned</span>
+<span class="text-label-md font-label-md">+24 pts</span>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (JSON Component Implementation) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 backdrop-blur-xl border-t border-white/10 bg-surface/80 dark:bg-surface-container/60 shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">local_taxi</span>
+<span class="text-label-sm font-label-sm">Ride</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/20 rounded-xl px-4 py-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="text-label-sm font-label-sm">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">gpp_maybe</span>
+<span class="text-label-sm font-label-sm">Safety</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-label-sm font-label-sm">Account</span>
+</a>
+</nav>
+<script>
+        // Interactive Star Rating Logic
+        const stars = document.querySelectorAll('.star');
+        const ratingLabel = document.getElementById('ratingLabel');
+        const labels = ["Poor", "Fair", "Good", "Great", "Excellent"];
+
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                const rating = index + 1;
+                updateStars(rating);
+                ratingLabel.textContent = labels[index];
+                ratingLabel.classList.add('animate-in', 'zoom-in-95');
+                setTimeout(() => ratingLabel.classList.remove('animate-in', 'zoom-in-95'), 300);
+            });
+
+            star.addEventListener('mouseenter', () => {
+                updateStars(index + 1, true);
+            });
+
+            star.addEventListener('mouseleave', () => {
+                const currentRating = Array.from(stars).filter(s => s.classList.contains('active')).length;
+                updateStars(currentRating);
+            });
+        });
+
+        function updateStars(rating, isHover = false) {
+            stars.forEach((star, i) => {
+                if (i < rating) {
+                    star.classList.add('active');
+                    if (isHover) star.style.opacity = '0.7';
+                    else star.style.opacity = '1';
+                } else {
+                    star.classList.remove('active');
+                    star.style.opacity = '0.3';
+                }
+            });
+        }
+
+        // Micro-interaction for Submit
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            this.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span>`;
+            this.disabled = true;
+            this.classList.add('opacity-80');
+            
+            setTimeout(() => {
+                this.innerHTML = `Success!`;
+                this.classList.remove('bg-primary-container');
+                this.classList.add('bg-on-primary-container', 'text-primary');
+                
+                // Show a success state after feedback is sent
+                confettiEffect();
+            }, 1200);
+        });
+
+        function confettiEffect() {
+            // Simple visual cue for completion
+            const mainCard = document.querySelector('.glass-panel');
+            mainCard.classList.add('ring-2', 'ring-primary', 'transition-all');
+        }
+    </script>
+</body></html>
