@@ -11,6 +11,11 @@ mongoose.connect('mongodb+srv://GolfCarAdmin:pass1234@golfcar.i9jx33e.mongodb.ne
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.log('❌ DB Error:', err));
 
+// Basic route for the root URL
+app.get('/', (req, res) => {
+  res.send('Welcome to the CampusKart API! The server is running successfully.');
+});
+
 // USER SCHEMA + MODEL (IMPORTANT)
 const userSchema = new mongoose.Schema({
   email: String,
