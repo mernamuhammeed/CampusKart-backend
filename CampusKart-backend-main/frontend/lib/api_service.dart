@@ -6,8 +6,16 @@ class ApiService {
   // --- SMART URL DETECTION ---
   // Automatically detects if it's running on Render or Localhost
   static String get baseUrl {
-    // Point directly to the live Render backend
-    return "https://campuskart-backend-ayzu.onrender.com"; 
+    if (kIsWeb) {
+      final origin = Uri.base.origin;
+      // If running locally in Chrome, point to the backend port (3000)
+      if (origin.contains('localhost') || origin.contains('127.0.0.1')) {
+        return "http://localhost:3000";
+      }
+      return origin;
+    }
+    // For local mobile testing (Android emulator uses 10.0.2.2)
+    return "http://localhost:3000"; 
   }
 
   // --- 1. SIGN UP ---
