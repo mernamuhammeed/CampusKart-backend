@@ -5290,7 +5290,7 @@ class _AdminScreenState extends State<AdminScreen> {
                       children: [
                         const Icon(Icons.verified, color: StitchColors.primaryContainer, size: 16),
                         const SizedBox(width: 8),
-                        const Text("Optimal Performance Zone", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
+                        const Flexible(child: Text("Optimal Performance Zone", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12), overflow: TextOverflow.ellipsis)),
                       ],
                     ),
                   ],
