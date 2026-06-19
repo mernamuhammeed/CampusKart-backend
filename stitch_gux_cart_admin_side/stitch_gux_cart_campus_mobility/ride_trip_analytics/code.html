@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fleet Command Dashboard | CampusKart</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#ffb3ad",
+                    "error": "#ffb4ab",
+                    "secondary": "#ffb95f",
+                    "surface-container-lowest": "#060e20",
+                    "on-surface-variant": "#bbcabf",
+                    "on-tertiary": "#68000a",
+                    "secondary-fixed-dim": "#ffb95f",
+                    "on-primary-fixed-variant": "#005236",
+                    "surface-bright": "#31394d",
+                    "on-secondary": "#472a00",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "on-error": "#690005",
+                    "on-tertiary-fixed": "#410004",
+                    "on-error-container": "#ffdad6",
+                    "background": "#0b1326",
+                    "surface": "#0b1326",
+                    "outline": "#86948a",
+                    "surface-container-highest": "#2d3449",
+                    "secondary-container": "#ee9800",
+                    "primary-container": "#10b981",
+                    "inverse-primary": "#006c49",
+                    "surface-container-low": "#131b2e",
+                    "surface-container": "#171f33",
+                    "surface-variant": "#2d3449",
+                    "primary-fixed-dim": "#4edea3",
+                    "primary": "#4edea3",
+                    "on-secondary-container": "#5b3800",
+                    "on-primary-container": "#00422b",
+                    "surface-dim": "#0b1326",
+                    "on-secondary-fixed": "#2a1700",
+                    "surface-tint": "#4edea3",
+                    "outline-variant": "#3c4a42",
+                    "on-primary-fixed": "#002113",
+                    "on-background": "#dae2fd",
+                    "inverse-surface": "#dae2fd",
+                    "on-primary": "#003824",
+                    "surface-container-high": "#222a3d",
+                    "on-tertiary-fixed-variant": "#930013",
+                    "on-secondary-fixed-variant": "#653e00",
+                    "on-tertiary-container": "#79000e",
+                    "secondary-fixed": "#ffddb8",
+                    "tertiary-fixed": "#ffdad7",
+                    "tertiary-container": "#ff7a73",
+                    "primary-fixed": "#6ffbbe",
+                    "on-surface": "#dae2fd",
+                    "error-container": "#93000a",
+                    "inverse-on-surface": "#283044"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section-margin": "24px",
+                    "container-padding": "20px",
+                    "stack-gap": "12px",
+                    "bottom-sheet-peak": "280px",
+                    "touch-target": "48px"
+            },
+            "fontFamily": {
+                    "body-md": ["Outfit"],
+                    "label-sm": ["Outfit"],
+                    "headline-lg": ["Outfit"],
+                    "label-md": ["Outfit"],
+                    "body-lg": ["Outfit"],
+                    "headline-xl": ["Outfit"],
+                    "title-md": ["Outfit"],
+                    "headline-lg-mobile": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "26px", "fontWeight": "400"}],
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .ambient-glow-primary {
+            box-shadow: 0 0 40px -10px rgba(78, 222, 163, 0.2);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2d3449;
+            border-radius: 10px;
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-soft {
+            animation: pulse-soft 3s ease-in-out infinite;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 140px;
+            height: 70px;
+            overflow: hidden;
+        }
+        .gauge-bg {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 12px solid #2d3449;
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+        }
+        .gauge-fill {
+            position: absolute;
+            top: 0;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 12px solid #4edea3;
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+            transform: rotate(-120deg);
+            transition: transform 1s ease-out;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- Fixed Left Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest border-r border-outline-variant/20 z-50 flex flex-col">
+<div class="p-6">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-black tracking-tighter">CampusKart</h1>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary-container/10 text-primary group transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Fleet Command</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-md text-label-md">Live View</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Trip Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined">settings_accessibility</span>
+<span class="font-label-md text-label-md">Access Control</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-label-md text-label-md">Maintenance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Fleet Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-outline-variant/10">
+<div class="flex items-center gap-3 glass-panel p-3 rounded-xl">
+<img class="w-10 h-10 rounded-full border border-primary/30" data-alt="A professional headshot of a campus security administrator in a high-tech office environment, cool cinematic lighting, blue and emerald green accents, high quality photography, modern professional attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1Gxr1RfTtXEd0Ic_L9Skd_VJCv4cTeVKb5oo2Wc1muDVivKkUXOr5m7BHSg20Q-DzhyplJnhCovLtaoK-0bC6Bm29gib4OImxHbzBgK9-I8zuvwnZD3DdtMGDOLnjOC28qza9l7RdpJKH2WbEPhL45HLdAHP8HG0rmTa_5-Lhx4R8AYDF6Ic9qHY1H65yj79_22L6cVGUc9jtr19jGYHWpI-tZQ_gF-xmnaL4IxsrJsKZ9NX2ISrVN4fXr7NlMq5UIvZJK7JZvo4"/>
+<div class="overflow-hidden">
+<p class="font-label-md text-label-md text-on-surface truncate">Admin Root</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Fleet Supervisor</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="ml-64 flex-1 flex flex-col relative">
+<!-- Fixed Top Header -->
+<header class="fixed top-0 left-64 right-0 h-16 glass-panel flex items-center justify-between px-8 z-40">
+<h2 class="font-title-md text-title-md font-bold tracking-tight">Fleet Command Dashboard</h2>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors relative">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="h-6 w-px bg-outline-variant/30 mx-2"></div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+<span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-primary">System Live</span>
+</div>
+</div>
+</header>
+<!-- Global Alerts Panel -->
+<div class="mt-16 px-8 py-4">
+<div class="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-center justify-between animate-pulse-soft">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">All shuttle systems online</p>
+<p class="font-label-sm text-label-sm text-primary/80">Fleet status: 12/12 active. No delays reported across campus zones.</p>
+</div>
+</div>
+<button class="text-primary hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+<!-- Scrollable Content -->
+<div class="px-8 pb-12 space-y-8">
+<!-- Bento Grid Section: Key Metrics -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Metric Card 1: Completed Trips -->
+<div class="glass-panel p-6 rounded-[2rem] flex flex-col justify-between ambient-glow-primary">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">route</span>
+</div>
+<span class="text-primary font-bold font-label-md text-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> +12%
+                        </span>
+</div>
+<div class="mt-8">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Total Completed Trips</h3>
+<p class="font-headline-xl text-headline-xl font-black mt-1">1,240</p>
+</div>
+<div class="mt-6 flex gap-1 h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-4/5 rounded-full"></div>
+</div>
+</div>
+<!-- Metric Card 2: MTBR Gauge -->
+<div class="glass-panel p-6 rounded-[2rem] flex flex-col items-center text-center">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-6">Mean Wait Time (MTBR)</h3>
+<div class="gauge-container">
+<div class="gauge-bg"></div>
+<div class="gauge-fill" style="transform: rotate(30deg);"></div>
+<div class="absolute inset-0 flex flex-col items-center justify-end pb-2">
+<p class="font-headline-lg text-headline-lg font-bold text-primary">2.5</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">minutes</p>
+</div>
+</div>
+<div class="mt-6 flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary-container">verified</span>
+<p class="font-label-sm text-label-sm">Optimal Performance Zone</p>
+</div>
+</div>
+<!-- Metric Card 3: Live Fleet Load -->
+<div class="glass-panel p-6 rounded-[2rem] flex flex-col justify-between overflow-hidden relative">
+<div class="z-10">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-2xl bg-secondary/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<span class="text-secondary font-bold font-label-md text-label-md">Peak Usage</span>
+</div>
+<div class="mt-8">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Avg. Occupancy</h3>
+<p class="font-headline-xl text-headline-xl font-black mt-1">84%</p>
+</div>
+</div>
+<div class="absolute -bottom-4 -right-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]">electric_rickshaw</span>
+</div>
+</div>
+</section>
+<!-- Large Charts Section -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- 24-hour Rush Hour Chart -->
+<div class="glass-panel p-8 rounded-[2rem]">
+<div class="flex items-center justify-between mb-10">
+<div>
+<h3 class="font-title-md text-title-md font-bold">Rush Hour Analysis</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Stacked trip volume over 24-hour period</p>
+</div>
+<select class="bg-surface-container-high border-none rounded-lg font-label-sm text-label-sm focus:ring-primary">
+<option>Last 24 Hours</option>
+<option>Last 7 Days</option>
+</select>
+</div>
+<div class="flex items-end justify-between h-48 gap-3">
+<!-- Bar chart simulation -->
+<div class="flex-1 flex flex-col gap-1 items-center group">
+<div class="w-full flex flex-col-reverse h-full bg-surface-container-low rounded-t-lg overflow-hidden">
+<div class="bg-primary-container h-[20%]"></div>
+<div class="bg-primary h-[15%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">08:00</span>
+</div>
+<div class="flex-1 flex flex-col gap-1 items-center group">
+<div class="w-full flex flex-col-reverse h-full bg-surface-container-low rounded-t-lg overflow-hidden">
+<div class="bg-primary-container h-[60%]"></div>
+<div class="bg-primary h-[30%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">12:00</span>
+</div>
+<div class="flex-1 flex flex-col gap-1 items-center group">
+<div class="w-full flex flex-col-reverse h-full bg-surface-container-low rounded-t-lg overflow-hidden">
+<div class="bg-primary-container h-[40%]"></div>
+<div class="bg-primary h-[25%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">16:00</span>
+</div>
+<div class="flex-1 flex flex-col gap-1 items-center group">
+<div class="w-full flex flex-col-reverse h-full bg-surface-container-low rounded-t-lg overflow-hidden">
+<div class="bg-primary-container h-[80%]"></div>
+<div class="bg-primary h-[10%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">20:00</span>
+</div>
+<div class="flex-1 flex flex-col gap-1 items-center group">
+<div class="w-full flex flex-col-reverse h-full bg-surface-container-low rounded-t-lg overflow-hidden">
+<div class="bg-primary-container h-[30%]"></div>
+<div class="bg-primary h-[10%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">00:00</span>
+</div>
+</div>
+<div class="mt-8 flex gap-6">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Regular Commute</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Event Shuttles</span>
+</div>
+</div>
+</div>
+<!-- Sentiment Distribution -->
+<div class="glass-panel p-8 rounded-[2rem] flex flex-col">
+<div class="mb-8">
+<h3 class="font-title-md text-title-md font-bold">User Sentiment</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Real-time feedback distribution</p>
+</div>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between font-label-md text-label-md mb-2">
+<span class="text-primary">Very Satisfied</span>
+<span>74%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-low rounded-full">
+<div class="h-full bg-primary rounded-full w-[74%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-md text-label-md mb-2">
+<span class="text-primary-fixed-dim">Neutral</span>
+<span>18%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-low rounded-full">
+<div class="h-full bg-primary-fixed-dim rounded-full w-[18%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-md text-label-md mb-2">
+<span class="text-error">Dissatisfied</span>
+<span>8%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-low rounded-full">
+<div class="h-full bg-error rounded-full w-[8%]"></div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-8 border-t border-outline-variant/10 grid grid-cols-2 gap-4">
+<div class="text-center">
+<p class="font-headline-lg text-headline-lg font-bold text-primary">4.8</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Avg. Stars</p>
+</div>
+<div class="text-center">
+<p class="font-headline-lg text-headline-lg font-bold text-secondary">92%</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Positive Ratio</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Feedback Scrolling Feed -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-title-md text-title-md font-bold">Live Feedback Stream</h3>
+<button class="text-primary font-label-md text-label-md hover:underline">View All</button>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
+<!-- Feedback Card 1 -->
+<div class="glass-panel p-5 rounded-2xl min-w-[320px] max-w-[320px] snap-start flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">alex.morgan@univ.edu</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">2 mins ago</p>
+</div>
+<div class="flex text-secondary scale-75 origin-right">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic overflow-hidden text-ellipsis line-clamp-3">
+                            "The new autonomous route to the Engineering Lab is incredibly smooth. Arrived 5 minutes early for my lecture!"
+                        </p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-widest">Timeliness</span>
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-widest">Comfort</span>
+</div>
+</div>
+<!-- Feedback Card 2 -->
+<div class="glass-panel p-5 rounded-2xl min-w-[320px] max-w-[320px] snap-start flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">j.chen98@campus.org</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">15 mins ago</p>
+</div>
+<div class="flex text-secondary scale-75 origin-right">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined">star</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic overflow-hidden text-ellipsis line-clamp-3">
+                            "Wait times at the Student Union were a bit longer today than usual, but the cart was very clean and quiet."
+                        </p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-secondary/10 text-secondary text-[10px] uppercase font-bold tracking-widest">Wait Time</span>
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-widest">Cleanliness</span>
+</div>
+</div>
+<!-- Feedback Card 3 -->
+<div class="glass-panel p-5 rounded-2xl min-w-[320px] max-w-[320px] snap-start flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">sarah.l@faculty.net</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">1 hour ago</p>
+</div>
+<div class="flex text-secondary scale-75 origin-right">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic overflow-hidden text-ellipsis line-clamp-3">
+                            "Excellent service for faculty members with heavy equipment. The app integration is flawless."
+                        </p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-widest">App UX</span>
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-widest">Staff Friendly</span>
+</div>
+</div>
+<!-- Feedback Card 4 -->
+<div class="glass-panel p-5 rounded-2xl min-w-[320px] max-w-[320px] snap-start flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">m.roberts@univ.edu</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">3 hours ago</p>
+</div>
+<div class="flex text-secondary scale-75 origin-right">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined">star</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic overflow-hidden text-ellipsis line-clamp-3">
+                            "Great initiative. Could use more stops near the North Campus housing, but overall a 5-star experience."
+                        </p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-secondary/10 text-secondary text-[10px] uppercase font-bold tracking-widest">Routes</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Background Ambient Animation -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+<div class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-secondary/5 blur-[120px] rounded-full"></div>
+</div>
+</main>
+<script>
+        // Micro-interactions for the gauge
+        document.addEventListener('DOMContentLoaded', () => {
+            const gaugeFill = document.querySelector('.gauge-fill');
+            // Animate to target state
+            setTimeout(() => {
+                // Calculation: -180 is empty, 0 is half full, 180 is full... 
+                // For a 2.5 min wait (say on a scale of 0-10 where 0 is best), 2.5 is very good
+                // Setting it to a positive value to show "good" status
+                gaugeFill.style.transform = 'rotate(-45deg)';
+            }, 500);
+
+            // Mock live data updates
+            setInterval(() => {
+                const completedTrips = document.querySelector('p.font-headline-xl');
+                if(completedTrips && completedTrips.innerText === '1,240') {
+                    completedTrips.classList.add('transition-all', 'duration-500', 'text-primary');
+                    completedTrips.innerText = '1,242';
+                    setTimeout(() => completedTrips.classList.remove('text-primary'), 2000);
+                }
+            }, 10000);
+        });
+    </script>
+</body></html>

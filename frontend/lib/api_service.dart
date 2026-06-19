@@ -85,6 +85,7 @@ class ApiService {
 
   // --- 3. RIDE REQUEST ---
   static Future<String?> sendRideRequest(
+    String studentEmail,
     String pickupName,
     String destName
   ) async {
@@ -97,7 +98,7 @@ class ApiService {
           "Accept": "application/json",
         },
         body: jsonEncode({
-          "studentEmail": "student@gu.edu.eg",
+          "studentEmail": studentEmail,
           "pickup": {
             "name": pickupName
           },
