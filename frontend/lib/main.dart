@@ -5267,16 +5267,16 @@ class _AdminScreenState extends State<AdminScreen> {
                         alignment: Alignment.bottomCenter,
                         children: [
                           Container(
-                            width: 140,
-                            height: 70,
+                            width: 180,
+                            height: 90,
                             decoration: BoxDecoration(
                               color: StitchColors.surfaceVariant,
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(100)),
                             ),
                           ),
                           Container(
-                            width: 140,
-                            height: 70,
+                            width: 180,
+                            height: 90,
                             decoration: const BoxDecoration(
                               color: StitchColors.primary,
                               borderRadius: BorderRadius.vertical(top: Radius.circular(100)),
@@ -5284,8 +5284,8 @@ class _AdminScreenState extends State<AdminScreen> {
                           ),
                           // Overlay to make it a ring
                           Container(
-                            width: 110,
-                            height: 55,
+                            width: 140,
+                            height: 70,
                             decoration: const BoxDecoration(
                               color: Color(0xFF1B2332), // approximated glass inner color
                               borderRadius: BorderRadius.vertical(top: Radius.circular(100)),
@@ -5411,8 +5411,13 @@ class _AdminScreenState extends State<AdminScreen> {
                                         ],
                                       ),
                                     ),
-                                  const SizedBox(height: 8),
-                                  if (index % 4 == 0) Text("${index.toString().padLeft(2, '0')}:00", style: const TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 10)),
+                                  if (index % 4 == 0) 
+                                    Text(
+                                      "${index.toString().padLeft(2, '0')}:00", 
+                                      style: const TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 10),
+                                      softWrap: false,
+                                      overflow: TextOverflow.visible,
+                                    ),
                                 ],
                               ),
                             ),
