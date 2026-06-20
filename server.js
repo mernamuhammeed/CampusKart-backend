@@ -65,6 +65,7 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 const Ride = mongoose.model('Ride', rideSchema);
+const CartTelemetry = require('./models/CartTelemetry');
 
 // Navigation Data for simulation
 const kStationCoords = {
@@ -1332,6 +1333,53 @@ app.get('/api/admin/analytics/vehicles', (req, res) => {
         res.status(200).json({ vehicles });
     } catch (err) {
         res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// --- ADMIN CART CONTROL ---
+app.get('/api/admin/control', async (req, res) => {
+    try {
+        const cart = await CartTelemetry.findOne({ cart_id: 'CART-01' });
+        if (!cart) {
+            return res.status(404).json({ error: 'Cart not found' });
+        }
+        res.status(200).json(cart);
+    } catch (err) {
+        res.status(500).json({ error: 'Server error', details: err.message });
+    }
+});
+
+app.post('/api/admin/control', async (req, res) => {
+    try {
+        const { estop, mode, manual_command, manual_throttle } = req.body;
+        
+        // Enforce basic constraints
+        const newControl = { 'admin_control.updated_at': new Date() };
+        if (typeof estop === 'boolean') newControl['admin_control.estop'] = estop;
+        if (mode === 'auto' || mode === 'manual') {
+            newControl['admin_control.mode'] = mode;
+            newControl['mode'] = mode; // duplicate at root based on DB scan
+        }
+        if (['stop', 'forward', 'reverse', 'brake'].includes(manual_command)) {
+            newControl['admin_control.manual_command'] = manual_command;
+            newControl['manual_command'] = manual_command; // duplicate at root
+        }
+        if (typeof manual_throttle === 'number') {
+            const clampedThrottle = Math.max(0, Math.min(100, manual_throttle));
+            newControl['admin_control.manual_throttle'] = clampedThrottle;
+            newControl['manual_throttle'] = clampedThrottle; // duplicate at root
+        }
+
+        const cart = await CartTelemetry.findOneAndUpdate(
+            { cart_id: 'CART-01' },
+            { $set: newControl },
+            { new: true, upsert: true }
+        );
+
+        res.status(200).json({ success: true, admin_control: cart.admin_control });
+    } catch (err) {
+        console.error("Error updating admin control:", err);
+        res.status(500).json({ error: 'Server error', details: err.message });
     }
 });
 

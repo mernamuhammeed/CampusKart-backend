@@ -260,4 +260,31 @@ class ApiService {
     } catch (e) { debugPrint("Vehicle analytics error: $e"); }
     return {'vehicles': []};
   }
+
+  // --- ADMIN: MANUAL CONTROL ---
+  static Future<Map<String, dynamic>> getAdminControl() async {
+    final String apiUrl = "$baseUrl/api/admin/control";
+    try {
+      final response = await http.get(Uri.parse(apiUrl)).timeout(const Duration(seconds: 8));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+    } catch (e) { debugPrint("Get admin control error: $e"); }
+    return {};
+  }
+
+  static Future<bool> postAdminControl(Map<String, dynamic> controlData) async {
+    final String apiUrl = "$baseUrl/api/admin/control";
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(controlData),
+      ).timeout(const Duration(seconds: 5));
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("Post admin control error: $e");
+      return false;
+    }
+  }
 }

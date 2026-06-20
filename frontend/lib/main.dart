@@ -2200,7 +2200,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "Join CampusKart",
+                          "Join GUX cart",
                           style: TextStyle(
                             fontFamily: 'Outfit',
                             fontSize: 16,
@@ -4612,7 +4612,7 @@ class SettingsScreen extends StatelessWidget {
           _settingTile(Icons.history, "Ride History"),
           const Divider(),
           _settingTile(Icons.help, "Help & Support"),
-          _settingTile(Icons.info, "About CampusKart"),
+          _settingTile(Icons.info, "About GUX cart"),
           const SizedBox(height: 40),
           OutlinedButton(
             onPressed: () => Navigator.pushAndRemoveUntil(
@@ -4709,6 +4709,13 @@ class _AdminScreenState extends State<AdminScreen> {
   bool _pulseState = false;
   Timer? _pulseTimer;
 
+  // Manual Override State
+  bool _estopActive = false;
+  String _mode = 'auto';
+  String _manualCommand = 'stop';
+  double _manualThrottle = 0.0;
+  Timer? _throttleTimer;
+  DateTime _lastControlSend = DateTime.now();
   @override
   void initState() {
     super.initState();
@@ -4733,11 +4740,19 @@ class _AdminScreenState extends State<AdminScreen> {
     final rideData = await ApiService.getRideAnalytics();
     final stationData = await ApiService.getStationAnalytics();
     final telemetryData = await ApiService.getLatestTelemetry();
+    final adminControlData = await ApiService.getAdminControl();
     if (mounted) {
       setState(() {
         _rideAnalytics = rideData;
         _stationAnalytics = stationData;
         _telemetry = telemetryData;
+        if (adminControlData.containsKey('admin_control')) {
+          final ac = adminControlData['admin_control'];
+          _estopActive = ac['estop'] ?? false;
+          _mode = ac['mode'] ?? 'auto';
+          _manualCommand = ac['manual_command'] ?? 'stop';
+          _manualThrottle = (ac['manual_throttle'] ?? 0).toDouble();
+        }
         _loading = false;
       });
     }
@@ -4895,7 +4910,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     const Padding(
                       padding: EdgeInsets.all(24.0),
                       child: Text(
-                        "CampusKart",
+                        "GUX cart",
                         style: TextStyle(
                           color: StitchColors.primary,
                           fontWeight: FontWeight.w900,
@@ -4917,6 +4932,10 @@ class _AdminScreenState extends State<AdminScreen> {
                           const SizedBox(height: 16),
                           _buildNavItem(Icons.electric_car_rounded, "Manage Vehicles", 4),
                           _buildNavItem(Icons.alt_route_rounded, "Manage Rides", 5),
+                          const SizedBox(height: 16),
+                          const Divider(color: Colors.white10),
+                          const SizedBox(height: 16),
+                          _buildNavItem(Icons.gamepad_rounded, "Manual Override", 6),
                         ],
                       ),
                     ),
@@ -5127,6 +5146,7 @@ class _AdminScreenState extends State<AdminScreen> {
       case 3: return _buildObcDiagnosticTab();
       case 4: return const AdminVehiclesScreen();
       case 5: return const AdminRidesScreen();
+      case 6: return _buildManualOverrideTab();
       default: return _buildRideAnalyticsTab();
     }
   }
@@ -6135,6 +6155,303 @@ class _AdminScreenState extends State<AdminScreen> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  void _sendControlUpdate({bool immediate = false}) {
+    if (!immediate) {
+      if (_throttleTimer?.isActive ?? false) return; // Debounce/throttle to max 5/sec (200ms)
+      _throttleTimer = Timer(const Duration(milliseconds: 200), () => _sendControlUpdate(immediate: true));
+      return;
+    }
+    
+    _lastControlSend = DateTime.now();
+    ApiService.postAdminControl({
+      'estop': _estopActive,
+      'mode': _mode,
+      'manual_command': _manualCommand,
+      'manual_throttle': _manualThrottle,
+    });
+  }
+
+  void _triggerEstop() {
+    setState(() {
+      _estopActive = true;
+      _mode = 'manual';
+      _manualCommand = 'stop';
+      _manualThrottle = 0.0;
+    });
+    _sendControlUpdate(immediate: true);
+  }
+
+  void _releaseEstop() {
+    setState(() => _estopActive = false);
+    _sendControlUpdate(immediate: true);
+  }
+
+  Widget _buildManualOverrideTab() {
+    final cartData = _telemetry['CK-001'] ?? {};
+    final bool isOnline = cartData['updated_at'] != null && DateTime.now().difference(DateTime.parse(cartData['updated_at'])) < const Duration(seconds: 5);
+    final double speed = (cartData['speed_kmh'] ?? 0.0).toDouble();
+    final int node = cartData['current_node'] ?? 0;
+    final int pax = cartData['on_board_count'] ?? 0;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header / Telemetry Heartbeat Monitor
+          GlassPanel(
+            child: Row(
+              children: [
+                Container(
+                  width: 16, height: 16,
+                  decoration: BoxDecoration(
+                    color: isOnline ? Colors.greenAccent : StitchColors.error,
+                    shape: BoxShape.circle,
+                    boxShadow: [BoxShadow(color: (isOnline ? Colors.greenAccent : StitchColors.error).withOpacity(0.5), blurRadius: 10)],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Text("CART-01 LINK STATUS", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: StitchColors.onSurface)),
+                const Spacer(),
+                _buildTelemetryPill(Icons.speed, "${speed.toStringAsFixed(1)} km/h"),
+                const SizedBox(width: 12),
+                _buildTelemetryPill(Icons.location_on, "Node $node"),
+                const SizedBox(width: 12),
+                _buildTelemetryPill(Icons.people, "$pax Pax"),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // EMERGENCY STOP SECTION
+          Center(
+            child: GestureDetector(
+              onTap: _estopActive ? null : _triggerEstop,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _estopActive ? StitchColors.error : StitchColors.error.withOpacity(0.2),
+                  border: Border.all(color: StitchColors.error, width: 4),
+                  boxShadow: _estopActive ? [BoxShadow(color: StitchColors.error.withOpacity(0.8), blurRadius: 50, spreadRadius: 10)] : [],
+                ),
+                child: Center(
+                  child: Text(
+                    _estopActive ? "E-STOP\nACTIVATED" : "EMERGENCY\nSTOP",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                      color: _estopActive ? Colors.white : StitchColors.error,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_estopActive) ...[
+            const SizedBox(height: 24),
+            Center(
+              child: SizedBox(
+                width: 300,
+                child: Slider(
+                  value: 0,
+                  onChanged: (val) {
+                    if (val > 0.9) _releaseEstop();
+                  },
+                  activeColor: StitchColors.error,
+                  inactiveColor: StitchColors.surfaceContainerLowest,
+                  label: "Swipe right to reset",
+                ),
+              ),
+            ),
+            const Center(child: Text("Swipe right to reset E-Stop", style: TextStyle(color: StitchColors.onSurfaceVariant))),
+          ],
+          
+          const SizedBox(height: 48),
+
+          // MODE SELECTOR
+          GlassPanel(
+            child: Row(
+              children: [
+                const Text("OPERATIONAL MODE", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: StitchColors.onSurface)),
+                const Spacer(),
+                ToggleButtons(
+                  isSelected: [_mode == 'auto', _mode == 'manual'],
+                  onPressed: (index) {
+                    if (index == 1 && _mode != 'manual') {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: StitchColors.surfaceContainerLowest,
+                          title: const Text("Confirm Manual Override", style: TextStyle(color: StitchColors.error)),
+                          content: const Text("Warning: Switching to manual mode will immediately cancel all active ride requests. Proceed?", style: TextStyle(color: StitchColors.onSurface)),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("CANCEL")),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: StitchColors.error),
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                setState(() => _mode = 'manual');
+                                _sendControlUpdate(immediate: true);
+                              },
+                              child: const Text("PROCEED"),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else if (index == 0) {
+                      setState(() => _mode = 'auto');
+                      _sendControlUpdate(immediate: true);
+                    }
+                  },
+                  fillColor: StitchColors.primary.withOpacity(0.2),
+                  selectedColor: StitchColors.primary,
+                  color: StitchColors.onSurfaceVariant,
+                  borderRadius: BorderRadius.circular(8),
+                  children: const [
+                    Padding(padding: EdgeInsets.symmetric(horizontal: 24), child: Text("AUTO")),
+                    Padding(padding: EdgeInsets.symmetric(horizontal: 24), child: Text("MANUAL")),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // MANUAL DRIVE MODULE
+          if (_mode == 'manual')
+            GlassPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("MANUAL DRIVE CONTROLS", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: StitchColors.primary)),
+                  const SizedBox(height: 24),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Direction
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("DIRECTION", style: TextStyle(color: StitchColors.onSurfaceVariant)),
+                            const SizedBox(height: 12),
+                            ToggleButtons(
+                              isSelected: [_manualCommand == 'forward', _manualCommand == 'reverse'],
+                              onPressed: (index) {
+                                setState(() {
+                                  _manualCommand = index == 0 ? 'forward' : 'reverse';
+                                  _manualThrottle = 0.0;
+                                });
+                                _sendControlUpdate(immediate: true);
+                              },
+                              fillColor: StitchColors.secondary.withOpacity(0.2),
+                              selectedColor: StitchColors.secondary,
+                              color: StitchColors.onSurfaceVariant,
+                              borderRadius: BorderRadius.circular(8),
+                              children: const [
+                                Padding(padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), child: Text("FORWARD")),
+                                Padding(padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), child: Text("REVERSE")),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: StitchColors.error,
+                                      padding: const EdgeInsets.symmetric(vertical: 24),
+                                    ),
+                                    onPressed: () {
+                                      setState(() { _manualCommand = 'stop'; _manualThrottle = 0; });
+                                      _sendControlUpdate(immediate: true);
+                                    },
+                                    child: const Text("STOP", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      padding: const EdgeInsets.symmetric(vertical: 24),
+                                    ),
+                                    onPressed: () {
+                                      setState(() { _manualCommand = 'brake'; _manualThrottle = 0; });
+                                      _sendControlUpdate(immediate: true);
+                                    },
+                                    child: const Text("BRAKE", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 48),
+                      // Throttle
+                      Column(
+                        children: [
+                          const Text("THROTTLE", style: TextStyle(color: StitchColors.onSurfaceVariant)),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 200,
+                            child: RotatedBox(
+                              quarterTurns: 3,
+                              child: Slider(
+                                value: _manualThrottle,
+                                min: 0, max: 100,
+                                activeColor: StitchColors.primary,
+                                inactiveColor: StitchColors.primary.withOpacity(0.1),
+                                onChanged: (val) {
+                                  if (_manualCommand != 'forward' && _manualCommand != 'reverse') return;
+                                  setState(() => _manualThrottle = val);
+                                  _sendControlUpdate();
+                                },
+                                onChangeEnd: (val) {
+                                  // Deadman switch snap back
+                                  setState(() => _manualThrottle = 0);
+                                  _sendControlUpdate(immediate: true);
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text("${_manualThrottle.toInt()}%", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: StitchColors.primary)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTelemetryPill(IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: StitchColors.onSurface.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: StitchColors.onSurfaceVariant),
+          const SizedBox(width: 8),
+          Text(text, style: const TextStyle(color: StitchColors.onSurface)),
         ],
       ),
     );
