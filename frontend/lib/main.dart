@@ -4859,9 +4859,22 @@ class _AdminScreenState extends State<AdminScreen> {
     }
 
     final alerts = _getGlobalAlerts();
+    final isMobile = MediaQuery.of(context).size.width < 900;
 
     return Scaffold(
       backgroundColor: StitchColors.surfaceContainerLowest,
+      appBar: isMobile 
+        ? AppBar(
+            backgroundColor: StitchColors.surfaceContainerLowest,
+            elevation: 0,
+            iconTheme: const IconThemeData(color: StitchColors.primary),
+            title: const Text("Fleet Command", style: TextStyle(color: StitchColors.primary, fontWeight: FontWeight.bold)),
+            actions: [
+              IconButton(icon: const Icon(Icons.refresh), onPressed: _loadAllData),
+            ],
+          )
+        : null,
+      drawer: isMobile ? Drawer(child: _buildSidebar()) : null,
       body: Stack(
         children: [
           // Background Ambient Animation (simplified static glow circles)
@@ -4899,150 +4912,72 @@ class _AdminScreenState extends State<AdminScreen> {
           Row(
             children: [
               // --- SIDEBAR (Stitch Layout) ---
-              Container(
-                width: 256,
-                decoration: const BoxDecoration(
-                  color: StitchColors.surfaceContainerLowest,
-                  border: Border(right: BorderSide(color: Colors.white10)),
-                ),
-                child: Column(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Text(
-                        "GUX cart",
-                        style: TextStyle(
-                          color: StitchColors.primary,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 24,
-                          letterSpacing: -1,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        children: [
-                          _buildNavItem(Icons.dashboard_rounded, "Ride & Trip Analytics", 0),
-                          _buildNavItem(Icons.map_rounded, "Station Analytics", 1),
-                          _buildNavItem(Icons.battery_charging_full_rounded, "Vehicle Health & Power", 2),
-                          _buildNavItem(Icons.developer_board_rounded, "Control OBC (Payload)", 3),
-                          const SizedBox(height: 16),
-                          const Divider(color: Colors.white10),
-                          const SizedBox(height: 16),
-                          _buildNavItem(Icons.electric_car_rounded, "Manage Vehicles", 4),
-                          _buildNavItem(Icons.alt_route_rounded, "Manage Rides", 5),
-                          const SizedBox(height: 16),
-                          const Divider(color: Colors.white10),
-                          const SizedBox(height: 16),
-                          _buildNavItem(Icons.gamepad_rounded, "Manual Override", 6),
-                        ],
-                      ),
-                    ),
-                    // Bottom Admin Profile Area
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(
-                        border: Border(top: BorderSide(color: Colors.white10)),
-                      ),
-                      child: GlassPanel(
-                        padding: const EdgeInsets.all(12),
-                        borderRadius: 16,
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: StitchColors.primary.withOpacity(0.3)),
-                                image: const DecorationImage(
-                                  image: NetworkImage("https://lh3.googleusercontent.com/aida-public/AB6AXuC1Gxr1RfTtXEd0Ic_L9Skd_VJCv4cTeVKb5oo2Wc1muDVivKkUXOr5m7BHSg20Q-DzhyplJnhCovLtaoK-0bC6Bm29gib4OImxHbzBgK9-I8zuvwnZD3DdtMGDOLnjOC28qza9l7RdpJKH2WbEPhL45HLdAHP8HG0rmTa_5-Lhx4R8AYDF6Ic9qHY1H65yj79_22L6cVGUc9jtr19jGYHWpI-tZQ_gF-xmnaL4IxsrJsKZ9NX2ISrVN4fXr7NlMq5UIvZJK7JZvo4"),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Admin Root", style: TextStyle(color: StitchColors.onSurface, fontWeight: FontWeight.bold, fontSize: 14)),
-                                  Text("Fleet Supervisor", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              if (!isMobile) _buildSidebar(),
               
               // --- MAIN CONTENT AREA ---
               Expanded(
                 child: Column(
                   children: [
                     // Top Header Bar
-                    GlassPanel(
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 0),
-                      borderRadius: 0,
-                      child: SizedBox(
-                        height: 64,
-                        child: Row(
-                          children: [
-                            const Text(
-                              "Fleet Command Dashboard",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: StitchColors.onSurface),
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              icon: const Icon(Icons.search, color: StitchColors.onSurfaceVariant),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.notifications, color: StitchColors.onSurfaceVariant),
-                              onPressed: () {},
-                            ),
-                            const SizedBox(width: 8),
-                            Container(width: 1, height: 24, color: Colors.white10),
-                            const SizedBox(width: 16),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: StitchColors.primary.withOpacity(0.1),
-                                border: Border.all(color: StitchColors.primary.withOpacity(0.2)),
-                                borderRadius: BorderRadius.circular(20),
+                    if (!isMobile)
+                      GlassPanel(
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 0),
+                        borderRadius: 0,
+                        child: SizedBox(
+                          height: 64,
+                          child: Row(
+                            children: [
+                              const Text(
+                                "Fleet Command Dashboard",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: StitchColors.onSurface),
                               ),
-                              child: Row(
-                                children: [
-                                  AnimatedOpacity(
-                                    opacity: _pulseState ? 1.0 : 0.3,
-                                    duration: const Duration(milliseconds: 500),
-                                    child: Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: const BoxDecoration(
-                                        color: StitchColors.primary,
-                                        shape: BoxShape.circle,
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.search, color: StitchColors.onSurfaceVariant),
+                                onPressed: () {},
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.notifications, color: StitchColors.onSurfaceVariant),
+                                onPressed: () {},
+                              ),
+                              const SizedBox(width: 8),
+                              Container(width: 1, height: 24, color: Colors.white10),
+                              const SizedBox(width: 16),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: StitchColors.primary.withOpacity(0.1),
+                                  border: Border.all(color: StitchColors.primary.withOpacity(0.2)),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    AnimatedOpacity(
+                                      opacity: _pulseState ? 1.0 : 0.3,
+                                      duration: const Duration(milliseconds: 500),
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          color: StitchColors.primary,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text("System Live", style: TextStyle(color: StitchColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
-                                ],
+                                    const SizedBox(width: 8),
+                                    const Text("System Live", style: TextStyle(color: StitchColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            IconButton(
-                              icon: const Icon(Icons.refresh, color: StitchColors.onSurfaceVariant),
-                              onPressed: _loadAllData,
-                            ),
-                          ],
+                              const SizedBox(width: 16),
+                              IconButton(
+                                icon: const Icon(Icons.refresh, color: StitchColors.onSurfaceVariant),
+                                onPressed: _loadAllData,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
 
                     // --- GLOBAL CRITICAL ALERTS PANEL ---
                     Padding(
@@ -5151,6 +5086,113 @@ class _AdminScreenState extends State<AdminScreen> {
     }
   }
 
+  Widget _buildResponsiveRow(List<Widget> children, bool isMobile, {double spacing = 24}) {
+    if (isMobile) {
+      return Column(
+        children: children.map((child) => Padding(
+          padding: EdgeInsets.only(bottom: spacing),
+          child: child,
+        )).toList(),
+      );
+    } else {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children.map((child) {
+          final isLast = children.last == child;
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: isLast ? 0 : spacing),
+              child: child,
+            ),
+          );
+        }).toList(),
+      );
+    }
+  }
+
+  Widget _buildSidebar() {
+    return Container(
+      width: 256,
+      decoration: const BoxDecoration(
+        color: StitchColors.surfaceContainerLowest,
+        border: Border(right: BorderSide(color: Colors.white10)),
+      ),
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Text(
+              "GUX cart",
+              style: TextStyle(
+                color: StitchColors.primary,
+                fontWeight: FontWeight.w900,
+                fontSize: 24,
+                letterSpacing: -1,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                _buildNavItem(Icons.dashboard_rounded, "Ride & Trip Analytics", 0),
+                _buildNavItem(Icons.map_rounded, "Station Analytics", 1),
+                _buildNavItem(Icons.battery_charging_full_rounded, "Vehicle Health & Power", 2),
+                _buildNavItem(Icons.developer_board_rounded, "Control OBC (Payload)", 3),
+                const SizedBox(height: 16),
+                const Divider(color: Colors.white10),
+                const SizedBox(height: 16),
+                _buildNavItem(Icons.electric_car_rounded, "Manage Vehicles", 4),
+                _buildNavItem(Icons.alt_route_rounded, "Manage Rides", 5),
+                const SizedBox(height: 16),
+                const Divider(color: Colors.white10),
+                const SizedBox(height: 16),
+                _buildNavItem(Icons.gamepad_rounded, "Manual Override", 6),
+              ],
+            ),
+          ),
+          // Bottom Admin Profile Area
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: Colors.white10)),
+            ),
+            child: GlassPanel(
+              padding: const EdgeInsets.all(12),
+              borderRadius: 16,
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: StitchColors.primary.withOpacity(0.3)),
+                      image: const DecorationImage(
+                        image: NetworkImage("https://lh3.googleusercontent.com/aida-public/AB6AXuC1Gxr1RfTtXEd0Ic_L9Skd_VJCv4cTeVKb5oo2Wc1muDVivKkUXOr5m7BHSg20Q-DzhyplJnhCovLtaoK-0bC6Bm29gib4OImxHbzBgK9-I8zuvwnZD3DdtMGDOLnjOC28qza9l7RdpJKH2WbEPhL45HLdAHP8HG0rmTa_5-Lhx4R8AYDF6Ic9qHY1H65yj79_22L6cVGUc9jtr19jGYHWpI-tZQ_gF-xmnaL4IxsrJsKZ9NX2ISrVN4fXr7NlMq5UIvZJK7JZvo4"),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Admin Root", style: TextStyle(color: StitchColors.onSurface, fontWeight: FontWeight.bold, fontSize: 14)),
+                        Text("Fleet Supervisor", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildNavItem(IconData icon, String title, int index) {
     bool isSelected = _currentIndex == index;
     return Padding(
@@ -5202,14 +5244,14 @@ class _AdminScreenState extends State<AdminScreen> {
     final double avgStars = totalRatingsCount > 0 ? (sumRatings / totalRatingsCount) : 0.0;
     final int positiveRatio = totalRatingsCount > 0 ? ((positiveRatings / totalRatingsCount) * 100).round() : 0;
 
+    final isMobile = MediaQuery.of(context).size.width < 900;
+
     return ListView(
       padding: const EdgeInsets.all(32),
       children: [
         // Top 3 Bento Grid Metrics
-        Row(
-          children: [
-            Expanded(
-              child: GlassPanel(
+        _buildResponsiveRow([
+          GlassPanel(
                 hasGlow: true,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -5252,11 +5294,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     ),
                   ],
                 ),
-              ),
             ),
-            const SizedBox(width: 24),
-            Expanded(
-              child: GlassPanel(
+          GlassPanel(
                 child: Column(
                   children: [
                     const Text("MEAN WAIT TIME (MTBR)", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12, letterSpacing: 2, fontWeight: FontWeight.bold)),
@@ -5315,11 +5354,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     ),
                   ],
                 ),
-              ),
             ),
-            const SizedBox(width: 24),
-            Expanded(
-              child: GlassPanel(
+          GlassPanel(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -5345,20 +5381,14 @@ class _AdminScreenState extends State<AdminScreen> {
                     const SizedBox(height: 30),
                   ],
                 ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ], isMobile),
         const SizedBox(height: 24),
         
         // Large Charts Section
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 24-Hour Rush Hour Chart
-            Expanded(
-              flex: 5,
-              child: GlassPanel(
+        _buildResponsiveRow([
+          // 24-Hour Rush Hour Chart
+          GlassPanel(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -5439,14 +5469,10 @@ class _AdminScreenState extends State<AdminScreen> {
                     ),
                   ],
                 ),
-              ),
             ),
-            const SizedBox(width: 24),
-            // User Sentiment
-            Expanded(
-              flex: 3,
-              child: GlassPanel(
-                child: Column(
+          // User Sentiment
+          GlassPanel(
+            child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text("User Sentiment", style: TextStyle(color: StitchColors.onSurface, fontSize: 20, fontWeight: FontWeight.bold)),
@@ -5481,9 +5507,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   ],
                 ),
               ),
-            ),
-          ],
-        ),
+          ], isMobile),
         const SizedBox(height: 24),
 
         // Live Feedback Stream
@@ -5587,6 +5611,8 @@ class _AdminScreenState extends State<AdminScreen> {
     int maxPickup = pickups.fold(1, (max, p) => ((p['count'] ?? 0) > max) ? p['count'] : max);
     int maxDest = destinations.fold(1, (max, d) => ((d['count'] ?? 0) > max) ? d['count'] : max);
 
+    final isMobile = MediaQuery.of(context).size.width < 900;
+
     return ListView(
       padding: const EdgeInsets.all(32),
       children: [
@@ -5598,12 +5624,9 @@ class _AdminScreenState extends State<AdminScreen> {
               const SizedBox(height: 4),
               const Text("High-demand zones requiring fleet redistribution", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
               const SizedBox(height: 32),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Pickup Stations
-                  Expanded(
-                    child: Column(
+              _buildResponsiveRow([
+                // Pickup Stations
+                Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
@@ -5651,12 +5674,9 @@ class _AdminScreenState extends State<AdminScreen> {
                             );
                           }),
                       ],
-                    ),
-                  ),
-                  const SizedBox(width: 48),
-                  // Destination Stations
-                  Expanded(
-                    child: Column(
+                ),
+                // Destination Stations
+                Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
@@ -5704,10 +5724,8 @@ class _AdminScreenState extends State<AdminScreen> {
                             );
                           }),
                       ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ], isMobile, spacing: 48),
             ],
           ),
         ),
@@ -5754,6 +5772,8 @@ class _AdminScreenState extends State<AdminScreen> {
     // Sort by highest power drawing unit
     units.sort((a, b) => b['power_w'].compareTo(a['power_w']));
 
+    final isMobile = MediaQuery.of(context).size.width < 900;
+
     return ListView(
       padding: const EdgeInsets.all(32),
       children: [
@@ -5769,8 +5789,8 @@ class _AdminScreenState extends State<AdminScreen> {
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: isMobile ? 1 : 2,
               crossAxisSpacing: 24,
               mainAxisSpacing: 24,
               childAspectRatio: 1.8,
@@ -5838,85 +5858,75 @@ class _AdminScreenState extends State<AdminScreen> {
           ),
           const SizedBox(height: 32),
 
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Real-Time Power Consumption Line Chart Card
-              Expanded(
-                flex: 5,
-                child: GlassPanel(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Real-Time Fleet Power consumption", style: TextStyle(color: StitchColors.onSurface, fontWeight: FontWeight.bold, fontSize: 20)),
-                      const SizedBox(height: 4),
-                      const Text("Live tracking of total energy consumption trend over time (Watts Draw)", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
-                      const SizedBox(height: 32),
-                      // Render the CustomPainter real-time chart using the current power of all carts combined
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        decoration: BoxDecoration(
-                          color: StitchColors.surfaceContainerLowest.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white10),
-                        ),
-                        child: RealTimePowerChart(
-                          currentPower: units.isNotEmpty
-                              ? units.map((u) => u['power_w'] as double).reduce((a, b) => a + b)
-                              : 0.0,
-                        ),
-                      ),
-                    ],
+          _buildResponsiveRow([
+            // Real-Time Power Consumption Line Chart Card
+            GlassPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Real-Time Fleet Power consumption", style: TextStyle(color: StitchColors.onSurface, fontWeight: FontWeight.bold, fontSize: 20)),
+                  const SizedBox(height: 4),
+                  const Text("Live tracking of total energy consumption trend over time (Watts Draw)", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
+                  const SizedBox(height: 32),
+                  // Render the CustomPainter real-time chart using the current power of all carts combined
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    decoration: BoxDecoration(
+                      color: StitchColors.surfaceContainerLowest.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: RealTimePowerChart(
+                      currentPower: units.isNotEmpty
+                          ? units.map((u) => u['power_w'] as double).reduce((a, b) => a + b)
+                          : 0.0,
+                    ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 24),
+            ),
 
-              // Power Consumption Leaderboard
-              Expanded(
-                flex: 3,
-                child: GlassPanel(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Power Draw Leaderboard", style: TextStyle(color: StitchColors.onSurface, fontWeight: FontWeight.bold, fontSize: 20)),
-                      const SizedBox(height: 4),
-                      const Text("Highest consuming units", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
-                      const SizedBox(height: 24),
-                      ...List.generate(units.length, (idx) {
-                        final unit = units[idx];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 32,
-                                height: 32,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(color: StitchColors.surfaceContainerHigh, shape: BoxShape.circle),
-                                child: Text("#${idx + 1}", style: const TextStyle(color: StitchColors.onSurfaceVariant, fontWeight: FontWeight.bold, fontSize: 12)),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(unit['cart_id'], style: const TextStyle(color: StitchColors.onSurface, fontWeight: FontWeight.bold)),
-                                    Text("SoC: ${unit['battery_pct']}%", style: const TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
-                                  ],
-                                ),
-                              ),
-                              Text("${unit['power_w']} W", style: const TextStyle(color: StitchColors.error, fontWeight: FontWeight.bold)),
-                            ],
+            // Power Consumption Leaderboard
+            GlassPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Power Draw Leaderboard", style: TextStyle(color: StitchColors.onSurface, fontWeight: FontWeight.bold, fontSize: 20)),
+                  const SizedBox(height: 4),
+                  const Text("Highest consuming units", style: TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
+                  const SizedBox(height: 24),
+                  ...List.generate(units.length, (idx) {
+                    final unit = units[idx];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(color: StitchColors.surfaceContainerHigh, shape: BoxShape.circle),
+                            child: Text("#${idx + 1}", style: const TextStyle(color: StitchColors.onSurfaceVariant, fontWeight: FontWeight.bold, fontSize: 12)),
                           ),
-                        );
-                      }),
-                    ],
-                  ),
-                ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(unit['cart_id'], style: const TextStyle(color: StitchColors.onSurface, fontWeight: FontWeight.bold)),
+                                Text("SoC: ${unit['battery_pct']}%", style: const TextStyle(color: StitchColors.onSurfaceVariant, fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                          Text("${unit['power_w']} W", style: const TextStyle(color: StitchColors.error, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
               ),
-            ],
-          ),
+            ),
+          ], isMobile),
         ],
       ],
     );
@@ -6197,11 +6207,12 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   Widget _buildManualOverrideTab() {
-    final cartData = _telemetry['CK-001'] ?? {};
-    final bool isOnline = cartData['updated_at'] != null && DateTime.now().difference(DateTime.parse(cartData['updated_at'])) < const Duration(seconds: 5);
-    final double speed = (cartData['speed_kmh'] ?? 0.0).toDouble();
-    final int node = cartData['current_node'] ?? 0;
-    final int pax = cartData['on_board_count'] ?? 0;
+    final telemetryData = _telemetry['CART-01'] ?? {};
+    final isMobile = MediaQuery.of(context).size.width < 900;
+    final bool isOnline = telemetryData['updated_at'] != null && DateTime.now().difference(DateTime.parse(telemetryData['updated_at'])) < const Duration(seconds: 5);
+    final double speed = (telemetryData['speed_kmh'] ?? 0.0).toDouble();
+    final int node = telemetryData['current_node'] ?? 0;
+    final int pax = telemetryData['on_board_count'] ?? 0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32),
@@ -6340,12 +6351,9 @@ class _AdminScreenState extends State<AdminScreen> {
                 children: [
                   const Text("MANUAL DRIVE CONTROLS", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: StitchColors.primary)),
                   const SizedBox(height: 24),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Direction
-                      Expanded(
-                        child: Column(
+                  _buildResponsiveRow([
+                    // Direction
+                    Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text("DIRECTION", style: TextStyle(color: StitchColors.onSurfaceVariant)),
@@ -6402,7 +6410,6 @@ class _AdminScreenState extends State<AdminScreen> {
                             ),
                           ],
                         ),
-                      ),
                       const SizedBox(width: 48),
                       // Throttle
                       Column(
@@ -6435,8 +6442,7 @@ class _AdminScreenState extends State<AdminScreen> {
                           Text("${_manualThrottle.toInt()}%", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: StitchColors.primary)),
                         ],
                       ),
-                    ],
-                  ),
+                  ], isMobile, spacing: 48),
                 ],
               ),
             ),
