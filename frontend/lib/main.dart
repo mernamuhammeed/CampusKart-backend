@@ -4848,17 +4848,17 @@ class _AdminScreenState extends State<AdminScreen> {
 
       // 5. Sensor & Hardware Faults
       final sensors = {
-        'ESP32': data['esp_status'],
-        'Left Ultra-Sonic': data['left_ultrasonic'],
-        'Right Ultra-Sonic': data['right_ultrasonic'],
-        'Rear Ultra-Sonic': data['rear_ultrasonic'],
-        'LiDAR': data['lidar_status'],
-        'IMU': data['imu_status'],
-        'GPS': data['gps_status'],
-        'Optical Encoder': data['encoder_status'],
-        '24V Rail': data['rail_24v_status'],
-        '5V Rail': data['rail_5v_status'],
-        'ACS-712': data['acs712_status'],
+        'ESP32': data['esp_status'] ?? 0,
+        'Left Ultra-Sonic': data['left_ultrasonic'] ?? 0,
+        'Right Ultra-Sonic': data['right_ultrasonic'] ?? 0,
+        'Rear Ultra-Sonic': data['rear_ultrasonic'] ?? 0,
+        'LiDAR': data['lidar_status'] ?? 0,
+        'IMU': data['imu_status'] ?? 0,
+        'GPS': data['gps_status'] ?? 0,
+        'Optical Encoder': data['encoder_status'] ?? 0,
+        '24V Rail': data['rail_24v_status'] ?? 0,
+        '5V Rail': data['rail_5v_status'] ?? 0,
+        'ACS-712': data['acs712_status'] ?? 0,
       };
 
       sensors.forEach((name, status) {
@@ -5968,19 +5968,19 @@ class _AdminScreenState extends State<AdminScreen> {
     _telemetry.forEach((cartId, data) {
       matrixData.add({
         "cart_id": cartId,
-        "plc_esp": (data['plc_status'] == 1 && data['esp_status'] == 1) ? 1 : 0,
-        "left_us": data['left_ultrasonic'] ?? 1,
-        "right_us": data['right_ultrasonic'] ?? 1,
-        "rear_us": data['rear_ultrasonic'] ?? 1,
-        "lidar": data['lidar_status'] ?? 1,
-        "imu": data['imu_status'] ?? 1,
-        "gps": data['gps_status'] ?? 1,
-        "encoder": data['encoder_status'] ?? 1,
-        "rail_24v": data['rail_24v_status'] ?? 1,
-        "rail_5v": data['rail_5v_status'] ?? 1,
-        "acs712": data['acs712_status'] ?? 1,
-        "rssi": (data['rssi'] ?? -65).toInt(),
-        "uptime": (data['uptime_pct'] ?? 99.8).toDouble(),
+        "plc_esp": ((data['plc_status'] ?? 0) == 1 && (data['esp_status'] ?? 0) == 1) ? 1 : 0,
+        "left_us": data['left_ultrasonic'] ?? 0,
+        "right_us": data['right_ultrasonic'] ?? 0,
+        "rear_us": data['rear_ultrasonic'] ?? 0,
+        "lidar": data['lidar_status'] ?? 0,
+        "imu": data['imu_status'] ?? 0,
+        "gps": data['gps_status'] ?? 0,
+        "encoder": data['encoder_status'] ?? 0,
+        "rail_24v": data['rail_24v_status'] ?? 0,
+        "rail_5v": data['rail_5v_status'] ?? 0,
+        "acs712": data['acs712_status'] ?? 0,
+        "rssi": -50,
+        "uptime": 100.0,
       });
     });
 

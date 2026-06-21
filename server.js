@@ -1066,71 +1066,7 @@ app.get('/api/admin/users', async (req, res) => {
 });
 
 
-// In-memory cache for live telemetry fallback
-const telemetryCache = {
-    "CK-001": {
-        cart_id: "CK-001",
-        speed_kmh: 12.5,
-        lat: 30.1,
-        lng: 31.2,
-        battery_pct: 85,
-        heading: 90,
-        lidar_dist: 5.2,
-        power_w: 1200.5,
-        motor_status: 1,
-        lights_status: 1,
-        aux_status: 1,
-        plc_status: 1,
-        esp_status: 1,
-        left_ultrasonic: 1,
-        right_ultrasonic: 1,
-        rear_ultrasonic: 1,
-        lidar_status: 1,
-        imu_status: 1,
-        gps_status: 1,
-        encoder_status: 1,
-        rail_24v_status: 1,
-        rail_5v_status: 1,
-        acs712_status: 1,
-        rssi: -55,
-        uptime_pct: 99.9,
-        soh: 98,
-        eta_min: '2m 10s',
-        distance_m: 450,
-        last_seen: new Date()
-    },
-    "CK-002": {
-        cart_id: "CK-002",
-        speed_kmh: 0,
-        lat: 30.11,
-        lng: 31.21,
-        battery_pct: 18, 
-        heading: 0,
-        lidar_dist: 0,
-        power_w: 50.0,
-        motor_status: 1,
-        lights_status: 1,
-        aux_status: 1,
-        plc_status: 1,
-        esp_status: 1,
-        left_ultrasonic: 1,
-        right_ultrasonic: 0, 
-        rear_ultrasonic: 1,
-        lidar_status: 1,
-        imu_status: 1,
-        gps_status: 1,
-        encoder_status: 1,
-        rail_24v_status: 1,
-        rail_5v_status: 1,
-        acs712_status: 1,
-        rssi: -85,
-        uptime_pct: 95.5,
-        soh: 89,
-        eta_min: '0s',
-        distance_m: 0,
-        last_seen: new Date()
-    }
-};
+const telemetryCache = {};
 
 // --- INFLUXDB TELEMETRY POST ---
 app.post('/api/telemetry', (req, res) => {
