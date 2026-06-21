@@ -803,12 +803,14 @@ const List<LatLng> kAllNodes = [
   LatLng(29.42863241, 32.40129261), // 760: Road Node 760
   LatLng(29.42854576, 32.40128919), // 761: Spiked Bump 8
   LatLng(29.42849938, 32.40127973), // 762: Road Node 762
+  LatLng(29.43194701, 32.39675958), // 763: Test Track Start
+  LatLng(29.43200577, 32.39683302), // 764: Test Track End
 ];
 
 
 const Map<String, int> kStationRegistry = {
-  'Test Track Start': 998,
-  'Test Track End': 999,
+  'Test Track Start': 763,
+  'Test Track End': 764,
   'Admission Station': 675,
   'Engineering Station': 616,
   'Arts & Design Station': 600,
@@ -1599,6 +1601,8 @@ const List<List<int>> kEdgeList = [
   [760, 761],
   [761, 762],
   [762, 277],
+  [763, 764],
+  [764, 763],
 ];
 
 double haversineDistance(LatLng p1, LatLng p2) {
