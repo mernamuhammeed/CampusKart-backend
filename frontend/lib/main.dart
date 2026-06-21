@@ -6362,23 +6362,21 @@ class _AdminScreenState extends State<AdminScreen> {
                           children: [
                             const Text("DIRECTION", style: TextStyle(color: StitchColors.onSurfaceVariant)),
                             const SizedBox(height: 12),
-                            ToggleButtons(
-                              isSelected: [_manualCommand == 'forward', _manualCommand == 'reverse'],
-                              onPressed: (index) {
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _manualCommand == 'forward' ? StitchColors.secondary : StitchColors.secondary.withOpacity(0.2),
+                                foregroundColor: _manualCommand == 'forward' ? Colors.white : StitchColors.onSurfaceVariant,
+                                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              onPressed: () {
                                 setState(() {
-                                  _manualCommand = index == 0 ? 'forward' : 'reverse';
+                                  _manualCommand = 'forward';
                                   _manualThrottle = 0.0;
                                 });
                                 _sendControlUpdate(immediate: true);
                               },
-                              fillColor: StitchColors.secondary.withOpacity(0.2),
-                              selectedColor: StitchColors.secondary,
-                              color: StitchColors.onSurfaceVariant,
-                              borderRadius: BorderRadius.circular(8),
-                              children: const [
-                                Padding(padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), child: Text("FORWARD")),
-                                Padding(padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), child: Text("REVERSE")),
-                              ],
+                              child: const Text("FORWARD", style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                             const SizedBox(height: 32),
                             Row(
@@ -6459,7 +6457,7 @@ class _AdminScreenState extends State<AdminScreen> {
                               InkWell(
                                 onTap: () {
                                   setState(() {
-                                    _manualSteering = (_manualSteering - 5.0).clamp(-25.7, 25.7);
+                                    _manualSteering = (_manualSteering - 1.0).clamp(-25.7, 25.7);
                                   });
                                   _sendControlUpdate();
                                 },
@@ -6479,7 +6477,7 @@ class _AdminScreenState extends State<AdminScreen> {
                               InkWell(
                                 onTap: () {
                                   setState(() {
-                                    _manualSteering = (_manualSteering + 5.0).clamp(-25.7, 25.7);
+                                    _manualSteering = (_manualSteering + 1.0).clamp(-25.7, 25.7);
                                   });
                                   _sendControlUpdate();
                                 },

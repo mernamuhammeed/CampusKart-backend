@@ -1351,7 +1351,7 @@ app.get('/api/admin/control', async (req, res) => {
 
 app.post('/api/admin/control', async (req, res) => {
     try {
-        const { estop, mode, manual_command, manual_throttle } = req.body;
+        const { estop, mode, manual_command, manual_throttle, manual_steering } = req.body;
         
         // Enforce basic constraints
         const newControl = { 'admin_control.updated_at': new Date() };
@@ -1368,6 +1368,11 @@ app.post('/api/admin/control', async (req, res) => {
             const clampedThrottle = Math.max(0, Math.min(100, manual_throttle));
             newControl['admin_control.manual_throttle'] = clampedThrottle;
             newControl['manual_throttle'] = clampedThrottle; // duplicate at root
+        }
+        if (typeof manual_steering === 'number') {
+            const clampedSteering = Math.max(-25.7, Math.min(25.7, manual_steering));
+            newControl['admin_control.manual_steering'] = clampedSteering;
+            newControl['manual_steering'] = clampedSteering; // duplicate at root
         }
 
         const cart = await CartTelemetry.findOneAndUpdate(
