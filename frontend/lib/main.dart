@@ -8,6 +8,8 @@ import 'dart:math' as math;
 
 // Exact station names provided by backend team
 const List<String> kStationNames = [
+  'Test Track Start',
+  'Test Track End',
   'Admission Station',
   'Engineering Station',
   'Arts & Design Station',
@@ -22,6 +24,8 @@ const List<String> kStationNames = [
 ];
 
 const Map<String, LatLng> kStationCoords = {
+  'Test Track Start': LatLng(29.43194701, 32.39675958),
+  'Test Track End': LatLng(29.43200577, 32.39683302),
   'Admission Station': LatLng(29.43107812, 32.40167970),
   'Engineering Station': LatLng(29.43355847, 32.39782279),
   'Arts & Design Station': LatLng(29.43288092, 32.39706283),
@@ -803,6 +807,8 @@ const List<LatLng> kAllNodes = [
 
 
 const Map<String, int> kStationRegistry = {
+  'Test Track Start': 998,
+  'Test Track End': 999,
   'Admission Station': 675,
   'Engineering Station': 616,
   'Arts & Design Station': 600,
@@ -1947,8 +1953,8 @@ class RealCampusMap extends StatelessWidget {
         initialCenter:
             pickupLocation ??
             cartLocation ??
-            const LatLng(29.431068, 32.401685),
-        initialZoom: 15.0,
+            const LatLng(29.43197639, 32.39679630),
+        initialZoom: 18.0,
       ),
       children: [
         TileLayer(
@@ -3014,17 +3020,20 @@ class SelectPickupScreen extends StatelessWidget {
                     separatorBuilder: (c, i) => Divider(color: AppThemeColors.getBorder(isDark)),
                     itemBuilder: (c, i) {
                       final stationName = locations[i];
+                      final isTestTrack = stationName.startsWith('Test Track');
+                      final displayTitle = isTestTrack ? stationName : '$stationName (Out of Range)';
+
                       return ListTile(
-                        leading: const Icon(
+                        leading: Icon(
                           Icons.my_location,
-                          color: AppColors.pickupOrange,
+                          color: isTestTrack ? AppColors.pickupOrange : AppThemeColors.getTextSecondary(isDark).withOpacity(0.5),
                         ),
                         title: Text(
-                          stationName,
+                          displayTitle,
                           style: TextStyle(
                             fontFamily: 'Outfit',
                             fontWeight: FontWeight.bold,
-                            color: AppThemeColors.getTextPrimary(isDark),
+                            color: isTestTrack ? AppThemeColors.getTextPrimary(isDark) : AppThemeColors.getTextSecondary(isDark),
                           ),
                         ),
                         trailing: Icon(
@@ -3033,6 +3042,12 @@ class SelectPickupScreen extends StatelessWidget {
                           color: AppThemeColors.getTextSecondary(isDark),
                         ),
                         onTap: () {
+                          if (!isTestTrack) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Station out of network range for current test run.")),
+                            );
+                            return;
+                          }
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -3138,6 +3153,8 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
                       final destName = locations[i];
                       if (destName == widget.pickupName) return const SizedBox.shrink();
 
+                      final isTestTrack = destName.startsWith('Test Track');
+                      final displayTitle = isTestTrack ? destName : '$destName (Out of Range)';
                       final isSelected = _previewDest == destName;
 
                       return ListTile(
@@ -3145,16 +3162,16 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
                         selectedTileColor: const Color(0xFF10B981).withOpacity(0.05),
                         leading: Icon(
                           Icons.location_on,
-                          color: isSelected ? const Color(0xFF10B981) : AppColors.destRed,
+                          color: isTestTrack ? (isSelected ? const Color(0xFF10B981) : AppColors.destRed) : AppThemeColors.getTextSecondary(isDark).withOpacity(0.5),
                         ),
                         title: Text(
-                          destName,
+                          displayTitle,
                           style: TextStyle(
                             fontFamily: 'Outfit',
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isSelected
+                            color: isTestTrack ? (isSelected
                                 ? const Color(0xFF10B981)
-                                : AppThemeColors.getTextPrimary(isDark),
+                                : AppThemeColors.getTextPrimary(isDark)) : AppThemeColors.getTextSecondary(isDark),
                           ),
                         ),
                         trailing: isSelected
@@ -3192,6 +3209,12 @@ class _SelectDestinationScreenState extends State<SelectDestinationScreen> {
                                 color: AppThemeColors.getTextSecondary(isDark),
                               ),
                         onTap: () {
+                          if (!isTestTrack) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Station out of network range for current test run.")),
+                            );
+                            return;
+                          }
                           setState(() => _previewDest = destName);
                         },
                       );
