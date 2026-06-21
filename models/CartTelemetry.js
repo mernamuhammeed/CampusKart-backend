@@ -14,6 +14,7 @@ const cartTelemetrySchema = new mongoose.Schema({
         mode: { type: String, enum: ['auto', 'manual'], default: 'auto' },
         manual_command: { type: String, enum: ['stop', 'forward', 'reverse', 'brake'], default: 'stop' },
         manual_throttle: { type: Number, min: 0, max: 100, default: 0 },
+        manual_steering: { type: Number, min: -25.7, max: 25.7, default: 0 },
         updated_at: { type: Date, default: Date.now }
     }
 });
