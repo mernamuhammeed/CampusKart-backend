@@ -4714,6 +4714,7 @@ class _AdminScreenState extends State<AdminScreen> {
   String _mode = 'auto';
   String _manualCommand = 'stop';
   double _manualThrottle = 0.0;
+  double _manualSteering = 0.0;
   Timer? _throttleTimer;
   DateTime _lastControlSend = DateTime.now();
   @override
@@ -4751,7 +4752,8 @@ class _AdminScreenState extends State<AdminScreen> {
           _estopActive = ac['estop'] ?? false;
           _mode = ac['mode'] ?? 'auto';
           _manualCommand = ac['manual_command'] ?? 'stop';
-          _manualThrottle = (ac['manual_throttle'] ?? 0).toDouble();
+          _manualThrottle = (ac['manual_throttle'] ?? 0.0).toDouble();
+          _manualSteering = (ac['manual_steering'] ?? 0.0).toDouble();
         }
         _loading = false;
       });
@@ -6188,6 +6190,7 @@ class _AdminScreenState extends State<AdminScreen> {
       'mode': _mode,
       'manual_command': _manualCommand,
       'manual_throttle': _manualThrottle,
+      'manual_steering': _manualSteering,
     });
   }
 
@@ -6197,6 +6200,7 @@ class _AdminScreenState extends State<AdminScreen> {
       _mode = 'manual';
       _manualCommand = 'stop';
       _manualThrottle = 0.0;
+      _manualSteering = 0.0;
     });
     _sendControlUpdate(immediate: true);
   }
@@ -6440,6 +6444,76 @@ class _AdminScreenState extends State<AdminScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text("${_manualThrottle.toInt()}%", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: StitchColors.primary)),
+                        ],
+                      ),
+                      const SizedBox(width: 48),
+                      // Steering
+                      Column(
+                        children: [
+                          const Text("STEERING", style: TextStyle(color: StitchColors.onSurfaceVariant)),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Left Button
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _manualSteering = (_manualSteering - 5.0).clamp(-25.7, 25.7);
+                                  });
+                                  _sendControlUpdate();
+                                },
+                                borderRadius: BorderRadius.circular(32),
+                                child: Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: StitchColors.secondary.withOpacity(0.2),
+                                    border: Border.all(color: StitchColors.secondary.withOpacity(0.5)),
+                                  ),
+                                  child: const Icon(Icons.arrow_back_ios_new, color: StitchColors.secondary, size: 32),
+                                ),
+                              ),
+                              const SizedBox(width: 24),
+                              // Right Button
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _manualSteering = (_manualSteering + 5.0).clamp(-25.7, 25.7);
+                                  });
+                                  _sendControlUpdate();
+                                },
+                                borderRadius: BorderRadius.circular(32),
+                                child: Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: StitchColors.secondary.withOpacity(0.2),
+                                    border: Border.all(color: StitchColors.secondary.withOpacity(0.5)),
+                                  ),
+                                  child: const Icon(Icons.arrow_forward_ios, color: StitchColors.secondary, size: 32),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          Text("Target Angle: ${_manualSteering > 0 ? '+' : ''}${_manualSteering.toStringAsFixed(1)}°", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: StitchColors.primary)),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: StitchColors.surfaceVariant,
+                              foregroundColor: StitchColors.onSurfaceVariant,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _manualSteering = 0.0;
+                              });
+                              _sendControlUpdate(immediate: true);
+                            },
+                            icon: const Icon(Icons.refresh),
+                            label: const Text("CENTER STEERING"),
+                          ),
                         ],
                       ),
                   ], isMobile, spacing: 48),
