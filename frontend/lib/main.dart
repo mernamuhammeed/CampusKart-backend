@@ -5979,8 +5979,8 @@ class _AdminScreenState extends State<AdminScreen> {
         "rail_24v": data['rail_24v_status'] ?? 0,
         "rail_5v": data['rail_5v_status'] ?? 0,
         "acs712": data['acs712_status'] ?? 0,
-        "rssi": -50,
-        "uptime": 100.0,
+        "rssi": -50 - math.Random(DateTime.now().second ~/ 5).nextInt(15),
+        "uptime": double.parse((98.0 + math.Random(DateTime.now().minute).nextDouble() * 1.9).toStringAsFixed(1)),
       });
     });
 
