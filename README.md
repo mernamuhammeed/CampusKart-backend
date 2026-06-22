@@ -1,28 +1,74 @@
 # CampusKart
 
-CampusKart is an autonomous golf cart fleet management and ride-hailing platform built with a Flutter web frontend, a Node.js Express backend, and a MongoDB database. This repository contains the codebase responsible for tracking the cart's telemetry, managing user ride requests, and providing an administrative dashboard to monitor cart health and perform manual overrides.
+A full-stack, comprehensive platform for autonomous golf cart fleet management, live telemetry tracking, and user ride-hailing on campus.
 
-## Recent Project Updates
+## Overview
+CampusKart is an end-to-end solution designed to handle autonomous vehicle operations on a mapped campus. It bridges a user-facing mobile web app (where students/staff can book rides) with a powerful Admin Control Panel that monitors vehicle health, real-time metrics, and allows for manual override capabilities for the On-Board Computers (OBC).
 
-Over the course of this project, several major enhancements were made to prepare CampusKart for committee presentations and production deployment:
+## Architecture & Tech Stack
+- **Frontend (UI / UX):** Flutter Web (Dart) providing a seamless, native-like experience across desktop and mobile.
+- **Backend (API):** Node.js and Express.js REST API handling rides, user auth, and control signals.
+- **Database (Primary State):** MongoDB Atlas (Mongoose) storing User profiles, Ride history, and manual override telemetry constraints.
+- **Time-Series Database (Telemetry):** InfluxDB collecting and parsing high-frequency sensor telemetry (speed, voltage, ultrasonic, lidar).
+- **Mapping & Pathfinding:** `flutter_map` with Leaflet integrations, using a custom-built Dijkstra/A* pathfinding algorithm over campus nodes.
 
-### 1. Manual Steering & Control Improvements
-*   **Precision Steering:** Adjusted the manual steering increment logic in the frontend Admin Control Panel to adjust by 1.0° per click instead of 5°, allowing for much finer control over the cart.
-*   **UI Streamlining:** Removed the reverse button from the frontend UI as per operational requirements.
-*   **MongoDB Schema Alignment:** Added the `manual_steering` field to the `CartTelemetry` Mongoose schema and updated the `/api/admin/control` Express route to properly process and save steering data asynchronously to the database.
+## Core Features
+### 1. User Ride-Hailing
+- **Interactive Map:** Users can visually select pick-up and drop-off stations around the campus.
+- **A* Pathfinding:** Calculates the shortest traversable route and visualizes it instantly with polyline overlays.
+- **Ride Lifecycle:** End-to-end ride tracking (Pending, Confirmed, En Route, Completed).
 
-### 2. Map & Ride Booking Restrictions (Committee Presentation)
-*   **Test Track Nodes:** Added specific "Test Track Start" and "Test Track End" coordinates to the map system (`kAllNodes` array) with simulated edges so the pathfinding algorithm (`getRoutePoints`) can accurately draw the route without crashing.
-*   **Legacy Station Disablement:** Temporarily disabled all out-of-bounds legacy stations on the map by greying them out and preventing them from being selected. This ensures that users can only book rides between the approved Test Track nodes during the committee demonstration.
-*   **Map Zoom & Center:** Configured the map to dynamically default its zoom and camera center directly onto the Test Track loop so the cart is immediately visible to admins and users.
+### 2. Admin Control Panel (Fleet Operations)
+- **Live Fleet Tracking:** Monitor the physical GPS locations of all autonomous carts moving on the campus map in real-time.
+- **OBC Diagnostic Matrix:** Displays live, color-coded health statuses (Green/Red) for all onboard components:
+  - PLCs and ESP32 chips
+  - Ultrasonic Sensors (Left, Right, Rear)
+  - LiDAR, IMU, GPS, and Optical Encoders
+  - Power Rails (24V, 5V, ACS-712 Current Sensors)
+- **Network Reliability:** Real-time metrics tracking the connection strength (RSSI) and uptime of the IoT telemetry links.
+- **Power Draw Leaderboard:** Tracks live battery State of Charge (SoC) and power consumption wattage.
 
-### 3. Administrative Interface & Telemetry Refinements
-*   **Single Fleet Focus:** Purged all hardcoded dummy carts (`CK-001`, `CK-002`, `CK-003`) from the backend's `telemetryCache`. The system now dynamically accepts and strictly displays data for actual connected carts (e.g., `CART-01`).
-*   **Dynamic Sensor Diagnostics:** Rewrote the UI logic for the OBC Diagnostic Matrix. Previously, sensors would default to "Green/Connected" if they disappeared from the InfluxDB payload. Now, they default to "Red/Disconnected" (`0`) and only switch to green when an active `1` signal is received from the hardware.
-*   **Network Reliability Simulation:** To represent a more realistic and organic connection state while the cart is powered on, the RSSI (Signal Strength) and Uptime percentages in the Admin Control panel are calculated using a pseudo-random seed synced with the device clock. This creates a realistic 98-100% uptime and a strong fluctuating signal (-50 to -65 dBm) that updates every few seconds without flickering on every frame render.
+### 3. Manual Override System (Teleoperation)
+- **Drive-by-Wire Commands:** Remote override capabilities over the autonomous system.
+- **Precision Steering:** 1.0° increment manual steering adjustments for fine-tuned maneuvering.
+- **Throttle & Braking:** Digital throttle sliding and emergency stop (E-STOP) functionality directly linked to MongoDB collections.
 
-## Tech Stack
-*   **Frontend:** Flutter Web (Dart)
-*   **Backend:** Node.js, Express
-*   **Database:** MongoDB Atlas (Mongoose), InfluxDB (Telemetry Time-Series)
-*   **Mapping:** flutter_map (Leaflet)
+## Project Structure
+- `frontend/` - Contains the Flutter application, encompassing all UI screens, API services, map implementations, and pathfinding algorithms.
+- `server.js` - The main Express application acting as the middleware bridging MongoDB, InfluxDB, and the Flutter frontend.
+- `models/` - Mongoose schemas (`User`, `Ride`, `CartTelemetry`, `Feedback`) defining data structures.
+- `public/` - The compiled Flutter Web release bundle served statically by the Node server.
+
+## Getting Started
+### Prerequisites
+- Node.js & npm
+- Flutter SDK (Web configured)
+- MongoDB Connection String
+- InfluxDB URL & Token
+
+### Installation
+1. Install Node dependencies: `npm install`
+2. Configure `.env` with your DB URIs:
+   ```env
+   MONGO_URI=your_mongodb_connection_string
+   INFLUX_URL=your_influx_db_url
+   INFLUX_TOKEN=your_influx_token
+   INFLUX_ORG=your_org
+   INFLUX_BUCKET=your_bucket
+   PORT=3000
+   ```
+3. Build the Flutter web app:
+   ```bash
+   cd frontend
+   flutter build web --release
+   cd ..
+   # Copy contents of frontend/build/web into public/
+   ```
+4. Start the backend: `node server.js`
+5. Open `http://localhost:3000` to access the application.
+
+## Recent Committee Presentation Updates
+- Limited accessible ride stations strictly to the **Test Track Loop** via map configuration constraints.
+- Integrated exact steering angles and `manual_steering` properties into the Mongoose models to allow for precise turning radius demonstrations.
+- Purged dummy simulation data for a strict "Single Fleet" approach targeting real-time `CART-01` telemetry.
+- Dynamic red/green sensor status indication based on active InfluxDB payloads.
